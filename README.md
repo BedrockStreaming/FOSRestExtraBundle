@@ -9,6 +9,7 @@ Extra features for the FOSRestBundle
 
 ```php
 
+use FOS\RestBundle\Controller\Annotations\QueryParam;
 use M6Web\Bundle\FOSRestExtraBundle\Annotation\RestrictExtraParam;
 
 /**
@@ -17,18 +18,22 @@ use M6Web\Bundle\FOSRestExtraBundle\Annotation\RestrictExtraParam;
 class TestController
 {
     /**
-     * Restricted controller
+     * Restricted controller : only "param1" is permitted
      *
      * @return void
      *
      * @RestrictExtraParam()
+     *
+     * @QueryParam(name="param1", requirements="\d+", nullable=true, description="My Param 1")
      */
     public function getRestrictedAction() {
 
     }
 
     /**
-     * Unrestricted controller
+     * Unrestricted controller : "param1" and unknown parameters are permitted
+     *
+     * @QueryParam(name="param1", requirements="\d+", nullable=true, description="My Param 1")
      *
      * @return void
      */
