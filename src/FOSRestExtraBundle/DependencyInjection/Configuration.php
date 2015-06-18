@@ -15,7 +15,7 @@ class Configuration implements ConfigurationInterface
     public function getConfigTreeBuilder()
     {
         $treeBuilder = new TreeBuilder();
-        $treeBuilder->root('m6_controller_extra');
+        $treeBuilder->root('m6_web_fos_rest_extra');
 
         return $treeBuilder;
     }

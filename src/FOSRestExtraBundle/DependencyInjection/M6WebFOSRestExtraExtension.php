@@ -9,7 +9,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder,
 /**
  * Class that loads and manages the bundle configuration
  */
-class M6ControllerExtraExtension extends Extension
+class M6WebFOSRestExtraExtension extends Extension
 {
     /**
      * {@inheritDoc}
@@ -31,6 +31,6 @@ class M6ControllerExtraExtension extends Extension
      */
     public function getAlias()
     {
-        return 'm6_controller_extra';
+        return 'm6_web_fos_rest_extra';
     }
 }
