@@ -1,0 +1,10 @@
+parameters:
+    param_fetcher_listener.class: M6Web\Bundle\FOSRestExtraBundle\EventListener\ParamFetcherListener
+
+services:
+    kernel.listener.param_fetcher:
+        class: "%param_fetcher_listener.class%"
+        arguments: [@annotation_reader, @fos_rest.request.param_fetcher]
+        scope: request
+        tags:
+            - { name: kernel.event_listener, event: kernel.controller, method: onKernelController }

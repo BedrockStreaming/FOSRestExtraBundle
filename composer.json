@@ -1,0 +1,33 @@
+{
+    "name": "m6web/fos-rest-extra-bundle",
+    "type": "symfony-bundle",
+    "description" : "Extra feature for the FOSRestBundle",
+    "authors": [
+        {
+            "name": "Fabien de Saint pern"
+        }
+    ],
+    "autoload": {
+        "psr-4": { "M6Web\\Bundle\\": "src/" }
+    },
+    "config": {
+      "bin-dir": "bin"
+    },
+    "minimum-stability" : "dev",
+    "prefer-stable": true,
+    "repositories": [
+        {
+            "type": "composer",
+            "url": "http://satis.m6web.fr"
+        }
+    ],
+    "require": {
+        "friendsofsymfony/rest-bundle"   : "~1.1"
+    },
+    "require-dev": {
+        "atoum/atoum"       : "@stable",
+        "atoum/atoum-bundle": "@stable",
+        "m6web/coke"        : "~1.2",
+        "m6web/symfony2-coding-standard" : "~1.1"
+    }
+}
