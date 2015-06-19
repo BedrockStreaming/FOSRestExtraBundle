@@ -1,4 +1,4 @@
-bundle-controller-extra
+fos-rest-extra-bundle
 =======================
 
 Extra features for the FOSRestBundle
