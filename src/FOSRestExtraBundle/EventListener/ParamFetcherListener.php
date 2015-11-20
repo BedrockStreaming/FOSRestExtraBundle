@@ -31,8 +31,11 @@ class ParamFetcherListener
     protected $errorCode = 400;
 
     /**
-     * Constructor.
-     *
+     * @var boolean
+     */
+    protected $alwaysCheckRequestParameters = false;
+
+    /**
      * @param Reader                $reader
      * @param ParamFetcherInterface $paramFetcher
      */
@@ -40,6 +43,32 @@ class ParamFetcherListener
     {
         $this->reader       = $reader;
         $this->paramFetcher = $paramFetcher;
+    }
+
+    /**
+     * @param boolean $check
+     *
+     * @return ParamFetcherListener
+     */
+    public function alwaysCheckRequestParameters($check)
+    {
+        $this->alwaysCheckRequestParameters = $check;
+
+        return $this;
+    }
+
+    /**
+     * Define HTTP status code returned on error
+     *
+     * @param integer $code
+     *
+     * @return ParamFetcherListener
+     */
+    public function setErrorCode($code)
+    {
+        $this->errorCode = $code;
+
+        return $this;
     }
 
     /**
@@ -51,21 +80,7 @@ class ParamFetcherListener
      */
     public function onKernelController(FilterControllerEvent $event)
     {
-        $controller = $event->getController();
-
-        if (is_callable($controller) && method_exists($controller, '__invoke')) {
-            $controller = array($controller, '__invoke');
-        }
-
-        if (!is_array($controller)) {
-            return;
-        }
-
-        // Reading the annotation
-        if ($anno = $this->reader->getMethodAnnotation(
-            new \ReflectionMethod($controller[0], $controller[1]),
-            'M6Web\Bundle\FOSRestExtraBundle\Annotation\RestrictExtraParam')
-        ) {
+        if ($this->isCheckRequired($event)) {
             $request = $event->getRequest();
 
             // Check difference between the paramFetcher and the request
@@ -84,5 +99,27 @@ class ParamFetcherListener
                 throw new HttpException($this->errorCode, $msg);
             }
         }
+    }
+
+    protected function isCheckRequired(FilterControllerEvent $event)
+    {
+        if ($this->alwaysCheckRequestParameters) {
+            return true;
+        }
+
+        $controller = $event->getController();
+
+        if (is_callable($controller) && method_exists($controller, '__invoke')) {
+            $controller = array($controller, '__invoke');
+        }
+
+        if (!is_array($controller)) {
+            return false;
+        }
+
+        return $this->reader->getMethodAnnotation(
+            new \ReflectionMethod($controller[0], $controller[1]),
+            'M6Web\Bundle\FOSRestExtraBundle\Annotation\RestrictExtraParam'
+        );
     }
 }

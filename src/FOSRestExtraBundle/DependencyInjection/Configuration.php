@@ -15,7 +15,21 @@ class Configuration implements ConfigurationInterface
     public function getConfigTreeBuilder()
     {
         $treeBuilder = new TreeBuilder();
-        $treeBuilder->root('m6_web_fos_rest_extra');
+        $rootNode = $treeBuilder->root('m6_web_fos_rest_extra');
+
+        $rootNode
+            ->children()
+                ->arrayNode('extra_query_parameters')
+                    ->children()
+                        ->scalarNode('always_check')
+                            ->defaultFalse()
+                        ->end()
+                        ->scalarNode('http_code')
+                            ->defaultValue(400)
+                        ->end()
+                    ->end()
+                ->end()
+            ->end();
 
         return $treeBuilder;
     }

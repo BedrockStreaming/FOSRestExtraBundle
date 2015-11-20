@@ -16,11 +16,29 @@ class M6WebFOSRestExtraExtension extends Extension
      */
     public function load(array $configs, ContainerBuilder $container)
     {
-        $configuration = new Configuration();
-        $this->processConfiguration($configuration, $configs);
-
         $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
         $loader->load('services.yml');
+
+        $configuration = new Configuration();
+        $config = $this->processConfiguration($configuration, $configs);
+
+        if (!empty($config['extra_query_parameters'])) {
+            $paramFetcherListener = $container->getDefinition('m6_web_fos_rest_extra.listener.param_fetcher.listener');
+
+            if (isset($config['extra_query_parameters']['always_check'])) {
+                $paramFetcherListener->addMethodCall(
+                    'alwaysCheckRequestParameters',
+                    [$config['extra_query_parameters']['always_check']]
+                );
+            }
+
+            if (isset($config['extra_query_parameters']['http_code'])) {
+                $paramFetcherListener->addMethodCall(
+                    'setErrorCode',
+                    [$config['extra_query_parameters']['http_code']]
+                );
+            }
+        }
     }
 
     /**
