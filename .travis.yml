@@ -9,6 +9,7 @@ php:
 before_script:
   - wget http://getcomposer.org/composer.phar
   - php composer.phar install --dev
+  - phpenv config-rm xdebug.ini
 
 script:
   - bin/coke

@@ -46,7 +46,7 @@ fost_rest:
 m6_web_fos_rest_extra:
     extra_query_parameters:
 
-        # Enable check of query parameters on all actions with or without dedicated annotation
+        # Enable check of extra query parameters on all actions with or without dedicated annotation
         # Optionnal, false by default
         always_check: true
 

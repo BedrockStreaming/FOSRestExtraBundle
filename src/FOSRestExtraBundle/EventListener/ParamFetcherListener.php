@@ -76,11 +76,11 @@ class ParamFetcherListener
      *
      * @param FilterControllerEvent $event
      *
-     * @throws \InvalidArgumentException
+     * @throws HttpException
      */
     public function onKernelController(FilterControllerEvent $event)
     {
-        if ($this->isCheckRequired($event)) {
+        if ($event->isMasterRequest() && $this->isCheckRequired($event)) {
             $request = $event->getRequest();
 
             // Check difference between the paramFetcher and the request

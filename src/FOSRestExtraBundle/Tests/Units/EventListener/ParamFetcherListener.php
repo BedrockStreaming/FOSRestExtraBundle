@@ -121,6 +121,7 @@ class ParamFetcherListener extends atoum\test
 
         // Generate Event
         $event = new \mock\Symfony\Component\HttpKernel\Event\FilterControllerEvent;
+        $event->getMockController()->isMasterRequest = true;
         $event->getMockController()->getRequest = $request;
         $event->getMockController()->getController = [
             'M6Web\Bundle\FOSRestExtraBundle\Tests\Units\EventListener\TestController',
