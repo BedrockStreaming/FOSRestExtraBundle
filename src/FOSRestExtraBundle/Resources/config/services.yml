@@ -2,7 +2,7 @@ parameters:
     param_fetcher_listener.class: M6Web\Bundle\FOSRestExtraBundle\EventListener\ParamFetcherListener
 
 services:
-    kernel.listener.param_fetcher:
+    m6_web_fos_rest_extra.listener.param_fetcher.listener:
         class: "%param_fetcher_listener.class%"
         arguments: [@annotation_reader, @fos_rest.request.param_fetcher]
         scope: request

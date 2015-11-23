@@ -32,13 +32,27 @@ new FOS\RestBundle\FOSRestBundle(),
 new M6Web\Bundle\FOSRestExtraBundle\M6WebFOSRestExtraBundle(),
 ```
 
-## Configuration
 
-Modify the FOSRestBundle configuration of your application to add :
+Then modify the FOSRestBundle configuration of your application to add :
 
 ```yaml
 fost_rest:
     param_fetcher_listener: true
+```
+
+## Configuration
+
+```yml
+m6_web_fos_rest_extra:
+    extra_query_parameters:
+
+        # Enable check of extra query parameters on all actions with or without dedicated annotation
+        # Optionnal, false by default
+        always_check: true
+
+        # HTTP status code of throwed exception on query with non allowed extra parameters
+        # Optionnal, 400 by default
+        http_code: 403
 ```
 
 ## Usage

@@ -41,6 +41,25 @@ class ParamFetcherListener extends atoum\test
                 )
                     ->isInstanceOf('Symfony\Component\HttpKernel\Exception\HttpException')
                     ->hasMessage("Invalid parameters 'test2' for route 'get_test'")
+                ->integer($this->exception->getStatusCode())
+                    ->isEqualTo(400)
+        ;
+
+        $this
+            ->if($base = $this->getBase(['test' => null], true))
+            ->and($base->alwaysCheckRequestParameters(true))
+            ->and($base->setErrorCode(401))
+            ->and($event = $this->getFilterControllerEvent('getNonRestrictedAction', ['test' => 'toto', 'test2' => 1]))
+            ->then
+                ->exception(
+                    function() use($base, $event) {
+                        $base->onKernelController($event);
+                    }
+                )
+                    ->isInstanceOf('Symfony\Component\HttpKernel\Exception\HttpException')
+                    ->hasMessage("Invalid parameters 'test2' for route 'get_test'")
+                ->integer($this->exception->getStatusCode())
+                    ->isEqualTo(401)
         ;
     }
 
@@ -102,6 +121,7 @@ class ParamFetcherListener extends atoum\test
 
         // Generate Event
         $event = new \mock\Symfony\Component\HttpKernel\Event\FilterControllerEvent;
+        $event->getMockController()->isMasterRequest = true;
         $event->getMockController()->getRequest = $request;
         $event->getMockController()->getController = [
             'M6Web\Bundle\FOSRestExtraBundle\Tests\Units\EventListener\TestController',
