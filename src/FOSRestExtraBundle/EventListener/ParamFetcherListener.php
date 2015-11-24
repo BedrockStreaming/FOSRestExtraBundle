@@ -33,7 +33,12 @@ class ParamFetcherListener
     /**
      * @var boolean
      */
-    protected $alwaysCheckRequestParameters = false;
+    protected $allowExtraParam = true;
+
+    /**
+     * @var boolean
+     */
+    protected $strict = false;
 
     /**
      * @param Reader                $reader
@@ -46,13 +51,25 @@ class ParamFetcherListener
     }
 
     /**
-     * @param boolean $check
+     * @param boolean $allow
      *
      * @return ParamFetcherListener
      */
-    public function alwaysCheckRequestParameters($check)
+    public function setAllowExtraParam($allow)
     {
-        $this->alwaysCheckRequestParameters = $check;
+        $this->allowExtraParam = $allow;
+
+        return $this;
+    }
+
+    /**
+     * @param boolean $strict
+     *
+     * @return ParamFetcherListener
+     */
+    public function setStrict($strict)
+    {
+        $this->strict = $strict;
 
         return $this;
     }
@@ -80,16 +97,25 @@ class ParamFetcherListener
      */
     public function onKernelController(FilterControllerEvent $event)
     {
-        if ($event->isMasterRequest() && $this->isCheckRequired($event)) {
-            $request = $event->getRequest();
+        if ($event->isMasterRequest()) {
+            $request      = $event->getRequest();
+            $paramFetcher = $this->paramFetcher;
+
+            if ($request->attributes->has('paramFetcher')) {
+                $paramFetcher = $request->attributes->get('paramFetcher');
+            }
 
             // Check difference between the paramFetcher and the request
-            $invalidParams = array_diff(
-                array_keys($request->query->all()),
-                array_keys($this->paramFetcher->all())
-            );
+            try {
+                $invalidParams = array_diff(
+                    array_keys($request->query->all()),
+                    array_keys($paramFetcher->all($this->strict))
+                );
+            } catch (\RuntimeException $e) {
+                throw new HttpException($this->errorCode, $e->getMessage(), $e);
+            }
 
-            if (!empty($invalidParams)) {
+            if (!empty($invalidParams) && $this->isExtraParametersCheckRequired($event)) {
                 $msg = sprintf(
                     "Invalid parameters '%s' for route '%s'",
                     implode(', ', $invalidParams),
@@ -101,25 +127,25 @@ class ParamFetcherListener
         }
     }
 
-    protected function isCheckRequired(FilterControllerEvent $event)
+    protected function isExtraParametersCheckRequired(FilterControllerEvent $event)
     {
-        if ($this->alwaysCheckRequestParameters) {
-            return true;
-        }
-
         $controller = $event->getController();
 
         if (is_callable($controller) && method_exists($controller, '__invoke')) {
             $controller = array($controller, '__invoke');
         }
 
-        if (!is_array($controller)) {
-            return false;
+        if (is_array($controller)) {
+            $annotation = $this->reader->getMethodAnnotation(
+                new \ReflectionMethod($controller[0], $controller[1]),
+                'M6Web\Bundle\FOSRestExtraBundle\Annotation\RestrictExtraParam'
+            );
+
+            if (!is_null($annotation)) {
+                return (bool) $annotation->value;
+            }
         }
 
-        return $this->reader->getMethodAnnotation(
-            new \ReflectionMethod($controller[0], $controller[1]),
-            'M6Web\Bundle\FOSRestExtraBundle\Annotation\RestrictExtraParam'
-        );
+        return !$this->allowExtraParam;
     }
 }

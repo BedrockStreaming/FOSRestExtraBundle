@@ -1,5 +1,4 @@
 <?php
-
 namespace M6Web\Bundle\FOSRestExtraBundle\Annotation;
 
 /**
@@ -10,5 +9,5 @@ namespace M6Web\Bundle\FOSRestExtraBundle\Annotation;
  */
 class RestrictExtraParam
 {
-
+    public $value = true;
 }

@@ -1,7 +1,7 @@
 fos-rest-extra-bundle
 =======================
 
-Extra features for the FOSRestBundle
+Provide extra feature for the [FOSRestBundle](https://github.com/FriendsOfSymfony/FOSRestBundle).
 
 ## Dependency
 
@@ -44,20 +44,26 @@ fost_rest:
 
 ```yml
 m6_web_fos_rest_extra:
-    extra_query_parameters:
+    param_fetcher:
 
-        # Enable check of extra query parameters on all actions with or without dedicated annotation
+        # Define if extra parameters are allowed. The behavior defined here is the default one and can
+        # be overrided by a "RestrictExtraParam" annotation on the current action.
+        # Optionnal, true by default
+        allow_extra: true
+
+        # Define if all parameters are strict. If true, all given parameters have to match defined
+        # format for each on of them.
         # Optionnal, false by default
-        always_check: true
+        strict: false
 
-        # HTTP status code of throwed exception on query with non allowed extra parameters
+        # HTTP status code of throwed exception on query with invalid parameters
         # Optionnal, 400 by default
-        http_code: 403
+        error_status_code: 400
 ```
 
 ## Usage
 
-- RestrictExtraParam Annotation : to forbid unknown parameters
+- `RestrictExtraParam(true/false)` Annotation : to allow (`false`) or forbid (`true`) unknown parameters, `true` by default.
 
 ```php
 
@@ -74,7 +80,7 @@ class TestController
      *
      * @return void
      *
-     * @RestrictExtraParam()
+     * @RestrictExtraParam(true)
      *
      * @QueryParam(name="param1", requirements="\d+", nullable=true, description="My Param 1")
      */
@@ -84,6 +90,7 @@ class TestController
 
     /**
      * Unrestricted controller : "param1" and unknown parameters are permitted
+     * except if bundle configuration doesn't allow it
      *
      * @QueryParam(name="param1", requirements="\d+", nullable=true, description="My Param 1")
      *
