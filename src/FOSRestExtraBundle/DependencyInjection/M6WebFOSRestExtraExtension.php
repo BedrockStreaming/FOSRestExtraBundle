@@ -22,21 +22,21 @@ class M6WebFOSRestExtraExtension extends Extension
         $configuration = new Configuration();
         $config = $this->processConfiguration($configuration, $configs);
 
-        if (!empty($config['extra_query_parameters'])) {
-            $paramFetcherListener = $container->getDefinition('m6_web_fos_rest_extra.listener.param_fetcher.listener');
+        if (!empty($config['param_fetcher'])) {
 
-            if (isset($config['extra_query_parameters']['always_check'])) {
-                $paramFetcherListener->addMethodCall(
-                    'alwaysCheckRequestParameters',
-                    [$config['extra_query_parameters']['always_check']]
-                );
-            }
+            $paramFetcherListener = $container
+                ->getDefinition('m6_web_fos_rest_extra.listener.param_fetcher.listener');
 
-            if (isset($config['extra_query_parameters']['http_code'])) {
-                $paramFetcherListener->addMethodCall(
-                    'setErrorCode',
-                    [$config['extra_query_parameters']['http_code']]
-                );
+            $configMap = [
+                'allow_extra'       => 'setAllowExtraParam',
+                'strict'            => 'setStrict',
+                'error_status_code' => 'setErrorCode',
+            ];
+
+            foreach ($configMap as $key => $method) {
+                if (isset($config['param_fetcher'][$key])) {
+                    $paramFetcherListener->addMethodCall($method, [$config['param_fetcher'][$key]]);
+                }
             }
         }
     }

@@ -1,31 +1,24 @@
 <?php
-
 namespace M6Web\Bundle\FOSRestExtraBundle\Tests\Units\EventListener;
 
 use M6Web\Bundle\FOSRestExtraBundle\Annotation\RestrictExtraParam;
 
-/**
- * TestController
- */
 class TestController
 {
     /**
-     * Test controller
-     *
-     * @return void
-     *
-     * @RestrictExtraParam()
+     * @RestrictExtraParam(true)
      */
-    public function getRestrictedAction() {
-
-    }
+    public function getRestrictedTrueAction() {}
 
     /**
-     * Test controller
-     *
-     * @return void
+     * @RestrictExtraParam(false)
      */
-    public function getNonRestrictedAction() {
+    public function getRestrictedFalseAction() {}
 
-    }
+    /**
+     * @RestrictExtraParam()
+     */
+    public function getRestrictedDefaultAction() {}
+
+    public function getNonRestrictedAction() {}
 }

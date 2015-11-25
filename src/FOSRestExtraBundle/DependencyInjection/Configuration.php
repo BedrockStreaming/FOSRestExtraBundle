@@ -19,12 +19,15 @@ class Configuration implements ConfigurationInterface
 
         $rootNode
             ->children()
-                ->arrayNode('extra_query_parameters')
+                ->arrayNode('param_fetcher')
                     ->children()
-                        ->scalarNode('always_check')
+                        ->scalarNode('allow_extra')
+                            ->defaultTrue()
+                        ->end()
+                        ->scalarNode('strict')
                             ->defaultFalse()
                         ->end()
-                        ->scalarNode('http_code')
+                        ->scalarNode('error_status_code')
                             ->defaultValue(400)
                         ->end()
                     ->end()
