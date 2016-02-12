@@ -4,7 +4,7 @@ parameters:
 services:
     m6_web_fos_rest_extra.listener.param_fetcher.listener:
         class: "%param_fetcher_listener.class%"
-        arguments: [@annotation_reader, @fos_rest.request.param_fetcher]
+        arguments: ["@annotation_reader", "@fos_rest.request.param_fetcher"]
         scope: request
         tags:
             - { name: kernel.event_listener, event: kernel.controller, method: onKernelController }
