@@ -15,17 +15,12 @@
     },
     "minimum-stability" : "dev",
     "prefer-stable": true,
-    "repositories": [
-        {
-            "type": "composer",
-            "url": "http://satis.m6web.fr"
-        }
-    ],
     "require": {
-        "friendsofsymfony/rest-bundle"   : "~1.1"
+        "friendsofsymfony/rest-bundle"   : "~1.1",
+        "doctrine/common": "@stable"
     },
     "require-dev": {
-        "atoum/atoum"       : "@stable",
+        "atoum/atoum"       : "^2.8||^3.0",
         "atoum/atoum-bundle": "@stable",
         "m6web/coke"        : "~1.2",
         "m6web/symfony2-coding-standard" : "~1.1"
