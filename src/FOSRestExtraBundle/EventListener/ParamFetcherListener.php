@@ -26,6 +26,11 @@ class ParamFetcherListener
     protected $paramFetcher;
 
     /**
+     * @var boolean
+     */
+    protected $debug;
+
+    /**
      * @var integer $errorCode Error code to return for invalid input
      */
     protected $errorCode = 400;
@@ -43,11 +48,13 @@ class ParamFetcherListener
     /**
      * @param Reader                $reader
      * @param ParamFetcherInterface $paramFetcher
+     * @param boolean               $debug
      */
-    public function __construct(Reader $reader, ParamFetcherInterface $paramFetcher)
+    public function __construct(Reader $reader, ParamFetcherInterface $paramFetcher, $debug = false)
     {
         $this->reader       = $reader;
         $this->paramFetcher = $paramFetcher;
+        $this->debug        = $debug;
     }
 
     /**
@@ -101,6 +108,10 @@ class ParamFetcherListener
             $request      = $event->getRequest();
             $paramFetcher = $this->paramFetcher;
 
+            if ($this->isDebugExclude($event)) {
+                return;
+            }
+
             if ($request->attributes->has('paramFetcher')) {
                 $paramFetcher = $request->attributes->get('paramFetcher');
             }
@@ -125,6 +136,11 @@ class ParamFetcherListener
                 throw new HttpException($this->errorCode, $msg);
             }
         }
+    }
+
+    protected function isDebugExclude(FilterControllerEvent $event)
+    {
+        return ($this->debug === true && in_array($event->getRequest()->get('_route'), ['_profiler', 'wdt']));
     }
 
     protected function isExtraParametersCheckRequired(FilterControllerEvent $event)

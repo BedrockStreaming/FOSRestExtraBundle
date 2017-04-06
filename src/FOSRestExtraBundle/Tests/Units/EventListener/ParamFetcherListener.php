@@ -125,7 +125,98 @@ class ParamFetcherListener extends atoum\test
         ;
     }
 
-    protected function getBase($fetcherParams, $restricted)
+    public function testDebugEnabledProfiler()
+    {
+        $this
+            ->if($base = $this->getBase(['raoul' => 1337], true, true))
+            ->and($event = $this->getFilterControllerEvent('getRestrictedDefaultAction', ['panel' => 'logger'], '_profiler'))
+            ->then
+                ->variable($base->onKernelController($event))
+                    ->isNull()
+        ;
+        $this
+            ->if($base = $this->getBase(['raoul' => 1337], false, true))
+            ->and($event = $this->getFilterControllerEvent('getRestrictedDefaultAction', ['panel' => 'logger'], '_profiler'))
+            ->then
+                ->variable($base->onKernelController($event))
+                    ->isNull()
+        ;
+    }
+
+    public function testDebugDisabledProfiler()
+    {
+        $this
+            ->if($base = $this->getBase(['raoul' => 1337], true, false))
+            ->and($event = $this->getFilterControllerEvent('getRestrictedDefaultAction', ['panel' => 'logger'], '_profiler'))
+            ->then
+                ->exception(function() use ($base, $event) {
+                    $base->onKernelController($event);
+                })
+                    ->isInstanceOf('Symfony\Component\HttpKernel\Exception\HttpException')
+                ->integer($this->exception->getStatusCode())
+                    ->isEqualTo(400)
+        ;
+
+        $this
+            ->if($base = $this->getBase(['raoul' => 1337], false, false))
+            ->and($event = $this->getFilterControllerEvent('getRestrictedDefaultAction', ['panel' => 'logger'], '_profiler'))
+            ->then
+                ->exception(function() use ($base, $event) {
+                    $base->onKernelController($event);
+                })
+                    ->isInstanceOf('Symfony\Component\HttpKernel\Exception\HttpException')
+                ->integer($this->exception->getStatusCode())
+                    ->isEqualTo(400)
+        ;
+    }
+
+    public function testDebugEnabledWdt()
+    {
+        $this
+            ->if($base = $this->getBase(['raoul' => 1337], true, true))
+            ->and($event = $this->getFilterControllerEvent('getRestrictedDefaultAction', ['panel' => 'logger'], 'wdt'))
+            ->then
+                ->variable($base->onKernelController($event))
+                    ->isNull()
+        ;
+
+        $this
+            ->if($base = $this->getBase(['raoul' => 1337], false, true))
+            ->and($event = $this->getFilterControllerEvent('getRestrictedDefaultAction', ['panel' => 'logger'], 'wdt'))
+            ->then
+                ->variable($base->onKernelController($event))
+                    ->isNull()
+        ;
+    }
+
+    public function testDebugDisabledWdt()
+    {
+        $this
+            ->if($base = $this->getBase(['raoul' => 1337], true, false))
+            ->and($event = $this->getFilterControllerEvent('getRestrictedDefaultAction', ['panel' => 'logger'], 'wdt'))
+            ->then
+                ->exception(function() use ($base, $event) {
+                    $base->onKernelController($event);
+                })
+                    ->isInstanceOf('Symfony\Component\HttpKernel\Exception\HttpException')
+                ->integer($this->exception->getStatusCode())
+                    ->isEqualTo(400)
+        ;
+
+        $this
+            ->if($base = $this->getBase(['raoul' => 1337], false, false))
+            ->and($event = $this->getFilterControllerEvent('getRestrictedDefaultAction', ['panel' => 'logger'], 'wdt'))
+            ->then
+                ->exception(function() use ($base, $event) {
+                    $base->onKernelController($event);
+                })
+                    ->isInstanceOf('Symfony\Component\HttpKernel\Exception\HttpException')
+                ->integer($this->exception->getStatusCode())
+                    ->isEqualTo(400)
+        ;
+    }
+
+    protected function getBase($fetcherParams, $restricted, $debug = false)
     {
         $this->mockGenerator->orphanize('__construct');
 
@@ -144,19 +235,19 @@ class ParamFetcherListener extends atoum\test
         };
 
         // Generate Base
-        $base = new Base($reader, $paramFetcher);
+        $base = new Base($reader, $paramFetcher, $debug);
 
         return $base;
     }
 
-    protected function getFilterControllerEvent($controllerMethod, $queryParams)
+    protected function getFilterControllerEvent($controllerMethod, $queryParams, $route = 'get_test')
     {
         $this->mockGenerator->orphanize('__construct');
 
         // Generate Request
         $request = new \mock\Symfony\Component\HttpFoundation\Request;
         $request->query = new ParameterBag($queryParams);
-        $request->attributes = new ParameterBag(['_route' => 'get_test']);
+        $request->attributes = new ParameterBag(['_route' => $route]);
 
         $this->mockGenerator->orphanize('__construct');
 
