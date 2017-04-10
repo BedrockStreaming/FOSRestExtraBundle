@@ -98,31 +98,36 @@ class ParamFetcherListener
     public function onKernelController(FilterControllerEvent $event)
     {
         if ($event->isMasterRequest()) {
-            $request      = $event->getRequest();
+            $request = $event->getRequest();
             $paramFetcher = $this->paramFetcher;
 
             if ($request->attributes->has('paramFetcher')) {
                 $paramFetcher = $request->attributes->get('paramFetcher');
             }
 
+            $requestGetParams = $request->query->all();
+            $requestPostParams = $request->request->all();
+
             // Check difference between the paramFetcher and the request
-            try {
-                $invalidParams = array_diff(
-                    array_keys($request->query->all()),
-                    array_keys($paramFetcher->all($this->strict))
-                );
-            } catch (\RuntimeException $e) {
-                throw new HttpException($this->errorCode, $e->getMessage(), $e);
-            }
+            foreach ([$requestGetParams, $requestPostParams] as $requestParams) {
+                try {
+                    $invalidParams = array_diff(
+                        array_keys($requestParams),
+                        array_keys($paramFetcher->all($this->strict))
+                    );
+                } catch (\RuntimeException $e) {
+                    throw new HttpException($this->errorCode, $e->getMessage(), $e);
+                }
 
-            if (!empty($invalidParams) && $this->isExtraParametersCheckRequired($event)) {
-                $msg = sprintf(
-                    "Invalid parameters '%s' for route '%s'",
-                    implode(', ', $invalidParams),
-                    $request->attributes->get('_route')
-                );
+                if (!empty($invalidParams) && $this->isExtraParametersCheckRequired($event)) {
+                    $msg = sprintf(
+                        "Invalid parameters '%s' for route '%s'",
+                        implode(', ', $invalidParams),
+                        $request->attributes->get('_route')
+                    );
 
-                throw new HttpException($this->errorCode, $msg);
+                    throw new HttpException($this->errorCode, $msg);
+                }
             }
         }
     }

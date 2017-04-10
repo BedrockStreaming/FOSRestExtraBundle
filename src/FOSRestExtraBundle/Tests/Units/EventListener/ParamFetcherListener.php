@@ -156,6 +156,7 @@ class ParamFetcherListener extends atoum\test
         // Generate Request
         $request = new \mock\Symfony\Component\HttpFoundation\Request;
         $request->query = new ParameterBag($queryParams);
+        $request->request = new ParameterBag($queryParams);
         $request->attributes = new ParameterBag(['_route' => 'get_test']);
 
         $this->mockGenerator->orphanize('__construct');
