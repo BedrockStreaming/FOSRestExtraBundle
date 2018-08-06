@@ -105,5 +105,5 @@ class TestController
 ## Launch Tests
 
 ```shell
-$ ./vendor/bin/atoum
+$ ./vendor/atoum/atoum/bin/atoum
 ```
