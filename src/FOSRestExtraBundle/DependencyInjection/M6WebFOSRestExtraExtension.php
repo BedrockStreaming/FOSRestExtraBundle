@@ -1,10 +1,10 @@
 <?php
 namespace M6Web\Bundle\FOSRestExtraBundle\DependencyInjection;
 
-use Symfony\Component\DependencyInjection\ContainerBuilder,
-    Symfony\Component\Config\FileLocator,
-    Symfony\Component\HttpKernel\DependencyInjection\Extension,
-    Symfony\Component\DependencyInjection\Loader;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\Config\FileLocator;
+use Symfony\Component\HttpKernel\DependencyInjection\Extension;
+use Symfony\Component\DependencyInjection\Loader;
 
 /**
  * Class that loads and manages the bundle configuration
@@ -23,7 +23,6 @@ class M6WebFOSRestExtraExtension extends Extension
         $config = $this->processConfiguration($configuration, $configs);
 
         if (!empty($config['param_fetcher'])) {
-
             $paramFetcherListener = $container
                 ->getDefinition('m6_web_fos_rest_extra.listener.param_fetcher.listener');
 
