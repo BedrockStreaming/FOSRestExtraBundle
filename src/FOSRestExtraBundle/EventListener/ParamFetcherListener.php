@@ -136,9 +136,8 @@ class ParamFetcherListener
     {
         $controller = $event->getController();
 
-        $name = '__invoke';
         if (is_object($controller) && is_callable($controller)) {
-            $controller = [$controller, $name];
+            $controller = [$controller, '__invoke'];
         }
 
         if (is_array($controller)) {
