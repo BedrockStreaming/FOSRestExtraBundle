@@ -2,23 +2,16 @@ name: Continuous Integration
 on: [pull_request]
 
 jobs:
-    ci_php74:
-        name: PHP 7.4 - Tests & Quality
+    ci:
+        name: PHP ${{ matrix.php-versions }} - Tests & Quality
         runs-on: ubuntu-latest
+        strategy:
+            matrix:
+                php-versions: ['7.4', '8.0']
         steps:
-            - uses: actions/checkout@master
+            - uses: actions/checkout@v2
             - uses: shivammathur/setup-php@v2
               with:
-                php-version: 7.4
-            - run: make install
-            - run: make ci
-    ci_php80:
-        name: PHP 8.0 - Tests & Quality
-        runs-on: ubuntu-latest
-        steps:
-            - uses: actions/checkout@master
-            - uses: shivammathur/setup-php@v2
-              with:
-                php-version: 8.0
+                php-version: ${{ matrix.php-versions }}
             - run: make install
             - run: make ci
