@@ -1,4 +1,5 @@
 <?php
+
 namespace M6Web\Bundle\FOSRestExtraBundle\DependencyInjection;
 
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;

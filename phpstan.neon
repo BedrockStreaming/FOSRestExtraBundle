@@ -1,0 +1,9 @@
+parameters:
+    excludePaths:
+           - 'src/FOSRestExtraBundle/Tests'
+    paths:
+        - 'src'
+    level: 'max'
+    checkGenericClassInNonGenericObjectType: false
+    ignoreErrors:
+        - '#Call to an undefined method Symfony\\Component\\Config\\Definition\\Builder\\NodeDefinition::children\(\)\.#'
