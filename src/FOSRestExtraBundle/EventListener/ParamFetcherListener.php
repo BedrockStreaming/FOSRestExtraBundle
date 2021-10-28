@@ -2,10 +2,9 @@
 
 namespace M6Web\Bundle\FOSRestExtraBundle\EventListener;
 
-use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
-use M6Web\Bundle\FOSRestExtraBundle\Annotation\RestrictExtraParam;
-use FOS\RestBundle\Request\ParamFetcherInterface;
 use Doctrine\Common\Annotations\Reader;
+use FOS\RestBundle\Request\ParamFetcherInterface;
+use Symfony\Component\HttpKernel\Event\ControllerEvent;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
 /**
@@ -15,43 +14,29 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
  */
 class ParamFetcherListener
 {
-    /**
-     * @var Reader
-     */
+    /** @var Reader */
     protected $reader;
 
-    /**
-     * @var ParamFetcherInterface
-     */
+    /** @var ParamFetcherInterface */
     protected $paramFetcher;
 
-    /**
-     * @var integer $errorCode Error code to return for invalid input
-     */
+    /** @var int Error code to return for invalid input */
     protected $errorCode = 400;
 
-    /**
-     * @var boolean
-     */
+    /** @var bool */
     protected $allowExtraParam = true;
 
-    /**
-     * @var boolean
-     */
+    /** @var bool */
     protected $strict = false;
 
-    /**
-     * @param Reader                $reader
-     * @param ParamFetcherInterface $paramFetcher
-     */
     public function __construct(Reader $reader, ParamFetcherInterface $paramFetcher)
     {
-        $this->reader       = $reader;
+        $this->reader = $reader;
         $this->paramFetcher = $paramFetcher;
     }
 
     /**
-     * @param boolean $allow
+     * @param bool $allow
      *
      * @return ParamFetcherListener
      */
@@ -63,7 +48,7 @@ class ParamFetcherListener
     }
 
     /**
-     * @param boolean $strict
+     * @param bool $strict
      *
      * @return ParamFetcherListener
      */
@@ -77,7 +62,7 @@ class ParamFetcherListener
     /**
      * Define HTTP status code returned on error
      *
-     * @param integer $code
+     * @param int $code
      *
      * @return ParamFetcherListener
      */
@@ -91,11 +76,9 @@ class ParamFetcherListener
     /**
      * Core controller handler.
      *
-     * @param FilterControllerEvent $event
-     *
      * @throws HttpException
      */
-    public function onKernelController(FilterControllerEvent $event)
+    public function onKernelController(ControllerEvent $event): void
     {
         if ($event->isMasterRequest()) {
             $request = $event->getRequest();
@@ -132,12 +115,12 @@ class ParamFetcherListener
         }
     }
 
-    protected function isExtraParametersCheckRequired(FilterControllerEvent $event)
+    protected function isExtraParametersCheckRequired(ControllerEvent $event): bool
     {
         $controller = $event->getController();
 
-        if (is_callable($controller) && method_exists($controller, '__invoke')) {
-            $controller = array($controller, '__invoke');
+        if (is_callable($controller) && (is_object($controller) || is_string($controller)) && method_exists($controller, '__invoke')) {
+            $controller = [$controller, '__invoke'];
         }
 
         if (is_array($controller)) {

@@ -1,9 +1,10 @@
 <?php
+
 namespace M6Web\Bundle\FOSRestExtraBundle\Tests\Units\EventListener;
 
-use mageekguy\atoum;
-use Symfony\Component\HttpFoundation\ParameterBag;
+use atoum\atoum;
 use M6Web\Bundle\FOSRestExtraBundle\EventListener\ParamFetcherListener as Base;
+use Symfony\Component\HttpFoundation\ParameterBag;
 
 /**
  * Test ParamFetcherListener
@@ -17,7 +18,7 @@ class ParamFetcherListener extends atoum\test
     {
         $this
             ->if($base = $this->getBase(['test' => null], true))
-            ->and($event = $this->getFilterControllerEvent('getRestrictedTrueAction', ['test' => 1]))
+            ->and($event = $this->getControllerEvent('getRestrictedTrueAction', ['test' => 1]))
             ->then
                 ->variable($base->onKernelController($event))
                     ->isNull()
@@ -31,10 +32,10 @@ class ParamFetcherListener extends atoum\test
     {
         $this
             ->if($base = $this->getBase(['test' => null], true))
-            ->and($event = $this->getFilterControllerEvent('getRestrictedTrueAction', ['test' => 'toto', 'test2' => 1]))
+            ->and($event = $this->getControllerEvent('getRestrictedTrueAction', ['test' => 'toto', 'test2' => 1]))
             ->then
                 ->exception(
-                    function() use($base, $event) {
+                    function () use ($base, $event) {
                         $base->onKernelController($event);
                     }
                 )
@@ -45,10 +46,10 @@ class ParamFetcherListener extends atoum\test
 
             ->if($base->setAllowExtraParam(true))
             ->and($base->setErrorCode(401))
-            ->and($event = $this->getFilterControllerEvent('getRestrictedTrueAction', ['test' => 'toto', 'test2' => 1]))
+            ->and($event = $this->getControllerEvent('getRestrictedTrueAction', ['test' => 'toto', 'test2' => 1]))
             ->then
                 ->exception(
-                    function() use($base, $event) {
+                    function () use ($base, $event) {
                         $base->onKernelController($event);
                     }
                 )
@@ -58,16 +59,16 @@ class ParamFetcherListener extends atoum\test
                     ->isEqualTo(401)
 
             ->if($base->setErrorCode(400))
-            ->and($event = $this->getFilterControllerEvent('getRestrictedFalseAction', ['test' => 'toto', 'test2' => 1]))
+            ->and($event = $this->getControllerEvent('getRestrictedFalseAction', ['test' => 'toto', 'test2' => 1]))
             ->then
                 ->variable($base->onKernelController($event))
                     ->isNull()
 
-            ->if($event = $this->getFilterControllerEvent('getRestrictedDefaultAction', ['test' => 'toto', 'test2' => 1]))
+            ->if($event = $this->getControllerEvent('getRestrictedDefaultAction', ['test' => 'toto', 'test2' => 1]))
             ->and($base->setAllowExtraParam(false))
             ->then
                 ->exception(
-                    function() use($base, $event) {
+                    function () use ($base, $event) {
                         $base->onKernelController($event);
                     }
                 )
@@ -85,7 +86,7 @@ class ParamFetcherListener extends atoum\test
     {
         $this
             ->if($base = $this->getBase(['test' => null], false))
-            ->and($event = $this->getFilterControllerEvent('getNonRestrictedAction', ['test' => 1]))
+            ->and($event = $this->getControllerEvent('getNonRestrictedAction', ['test' => 1]))
             ->then
                 ->variable($base->onKernelController($event))
                     ->isNull()
@@ -99,7 +100,7 @@ class ParamFetcherListener extends atoum\test
     {
         $this
             ->if($base = $this->getBase(['test' => null], false))
-            ->and($event = $this->getFilterControllerEvent('getNonRestrictedAction', ['test' => 'toto', 'test2' => 1]))
+            ->and($event = $this->getControllerEvent('getNonRestrictedAction', ['test' => 'toto', 'test2' => 1]))
             ->then
                 ->variable($base->onKernelController($event))
                     ->isNull()
@@ -114,9 +115,9 @@ class ParamFetcherListener extends atoum\test
         $this
             ->if($base = $this->getBase(['test' => null], false, true))
             ->and($base->setStrict(true))
-            ->and($event = $this->getFilterControllerEvent('getNonRestrictedAction', ['test' => 'toto', 'test2' => 1]))
+            ->and($event = $this->getControllerEvent('getNonRestrictedAction', ['test' => 'toto', 'test2' => 1]))
             ->then
-                ->exception(function() use ($base, $event) {
+                ->exception(function () use ($base, $event) {
                     $base->onKernelController($event);
                 })
                     ->isInstanceOf('Symfony\Component\HttpKernel\Exception\HttpException')
@@ -130,14 +131,14 @@ class ParamFetcherListener extends atoum\test
         $this->mockGenerator->orphanize('__construct');
 
         // Generate Reader (a real one !)
-        $reader = new \Doctrine\Common\Annotations\AnnotationReader;
+        $reader = new \Doctrine\Common\Annotations\AnnotationReader();
 
         // Generate ParamFetcher
-        $paramFetcher = new \mock\FOS\RestBundle\Request\ParamFetcherInterface;
+        $paramFetcher = new \mock\FOS\RestBundle\Request\ParamFetcherInterface();
 
         $paramFetcher->getMockController()->all = function ($strict = false) use ($fetcherParams) {
             if ($strict) {
-                throw new \RuntimeException;
+                throw new \RuntimeException();
             }
 
             return $fetcherParams;
@@ -149,12 +150,12 @@ class ParamFetcherListener extends atoum\test
         return $base;
     }
 
-    protected function getFilterControllerEvent($controllerMethod, $queryParams)
+    protected function getControllerEvent($controllerMethod, $queryParams)
     {
         $this->mockGenerator->orphanize('__construct');
 
         // Generate Request
-        $request = new \mock\Symfony\Component\HttpFoundation\Request;
+        $request = new \mock\Symfony\Component\HttpFoundation\Request();
         $request->query = new ParameterBag($queryParams);
         $request->request = new ParameterBag($queryParams);
         $request->attributes = new ParameterBag(['_route' => 'get_test']);
@@ -162,12 +163,12 @@ class ParamFetcherListener extends atoum\test
         $this->mockGenerator->orphanize('__construct');
 
         // Generate Event
-        $event = new \mock\Symfony\Component\HttpKernel\Event\FilterControllerEvent;
+        $event = new \mock\Symfony\Component\HttpKernel\Event\ControllerEvent();
         $event->getMockController()->isMasterRequest = true;
         $event->getMockController()->getRequest = $request;
         $event->getMockController()->getController = [
             'M6Web\Bundle\FOSRestExtraBundle\Tests\Units\EventListener\TestController',
-            $controllerMethod
+            $controllerMethod,
         ];
 
         return $event;

@@ -1,0 +1,17 @@
+name: Continuous Integration
+on: [pull_request]
+
+jobs:
+    ci:
+        name: PHP ${{ matrix.php-versions }} - Tests & Quality
+        runs-on: ubuntu-latest
+        strategy:
+            matrix:
+                php-versions: ['7.4', '8.0']
+        steps:
+            - uses: actions/checkout@v2
+            - uses: shivammathur/setup-php@v2
+              with:
+                php-version: ${{ matrix.php-versions }}
+            - run: make install
+            - run: make ci
