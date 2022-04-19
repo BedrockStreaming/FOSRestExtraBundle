@@ -14,20 +14,12 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
  */
 class ParamFetcherListener
 {
-    /** @var Reader */
-    protected $reader;
-
-    /** @var ParamFetcherInterface */
-    protected $paramFetcher;
-
+    protected Reader $reader;
+    protected ParamFetcherInterface $paramFetcher;
     /** @var int Error code to return for invalid input */
-    protected $errorCode = 400;
-
-    /** @var bool */
-    protected $allowExtraParam = true;
-
-    /** @var bool */
-    protected $strict = false;
+    protected int $errorCode = 400;
+    protected bool $allowExtraParam = true;
+    protected bool $strict = false;
 
     public function __construct(Reader $reader, ParamFetcherInterface $paramFetcher)
     {
@@ -35,24 +27,14 @@ class ParamFetcherListener
         $this->paramFetcher = $paramFetcher;
     }
 
-    /**
-     * @param bool $allow
-     *
-     * @return ParamFetcherListener
-     */
-    public function setAllowExtraParam($allow)
+    public function setAllowExtraParam(bool $allow): self
     {
         $this->allowExtraParam = $allow;
 
         return $this;
     }
 
-    /**
-     * @param bool $strict
-     *
-     * @return ParamFetcherListener
-     */
-    public function setStrict($strict)
+    public function setStrict(bool $strict): self
     {
         $this->strict = $strict;
 
@@ -61,12 +43,8 @@ class ParamFetcherListener
 
     /**
      * Define HTTP status code returned on error
-     *
-     * @param int $code
-     *
-     * @return ParamFetcherListener
      */
-    public function setErrorCode($code)
+    public function setErrorCode(int $code): self
     {
         $this->errorCode = $code;
 
@@ -75,16 +53,14 @@ class ParamFetcherListener
 
     /**
      * Core controller handler.
-     *
-     * @throws HttpException
      */
     public function onKernelController(ControllerEvent $event): void
     {
-        if ($event->isMasterRequest()) {
+        if ($event->isMainRequest()) {
             $request = $event->getRequest();
             $paramFetcher = $this->paramFetcher;
 
-            if ($request->attributes->has('paramFetcher')) {
+            if ($request->attributes->has('paramFetcher') && $request->attributes->get('paramFetcher') instanceof ParamFetcherInterface) {
                 $paramFetcher = $request->attributes->get('paramFetcher');
             }
 
@@ -103,10 +79,11 @@ class ParamFetcherListener
                 }
 
                 if (!empty($invalidParams) && $this->isExtraParametersCheckRequired($event)) {
+                    $route = $request->attributes->get('_route');
                     $msg = sprintf(
                         "Invalid parameters '%s' for route '%s'",
                         implode(', ', $invalidParams),
-                        $request->attributes->get('_route')
+                        is_string($route) ? $route : 'unknown'
                     );
 
                     throw new HttpException($this->errorCode, $msg);

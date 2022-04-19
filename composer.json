@@ -17,12 +17,15 @@
     "prefer-stable": true,
     "require": {
         "php": "^7.4|^8.0",
-        "friendsofsymfony/rest-bundle"   : "~1.1||^2.0",
+        "friendsofsymfony/rest-bundle" : "^3.3",
+        "symfony/config": "^5.4|^6.0",
+        "symfony/dependency-injection": "^5.4|^6.0",
+        "symfony/http-foundation": "^5.4|^6.0",
         "doctrine/common": "@stable"
     },
     "require-dev": {
-        "atoum/atoum"       : "^4.0",
+        "atoum/atoum"              : "^4.0",
         "m6web/php-cs-fixer-config": "2.0.*",
-        "phpstan/phpstan": "0.12.*"
+        "phpstan/phpstan"          : "^1.8"
     }
 }
