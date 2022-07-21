@@ -4,7 +4,12 @@ namespace M6Web\Bundle\FOSRestExtraBundle\Tests\Units\EventListener;
 
 use atoum\atoum;
 use M6Web\Bundle\FOSRestExtraBundle\EventListener\ParamFetcherListener as Base;
-use Symfony\Component\HttpFoundation\ParameterBag;
+use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\Event\ControllerEvent;
+use Symfony\Component\HttpKernel\Exception\HttpException;
+use Symfony\Component\HttpKernel\HttpKernel;
+use Symfony\Component\HttpKernel\HttpKernelInterface;
 
 /**
  * Test ParamFetcherListener
@@ -39,7 +44,7 @@ class ParamFetcherListener extends atoum\test
                         $base->onKernelController($event);
                     }
                 )
-                    ->isInstanceOf('Symfony\Component\HttpKernel\Exception\HttpException')
+                    ->isInstanceOf(HttpException::class)
                     ->hasMessage("Invalid parameters 'test2' for route 'get_test'")
                 ->integer($this->exception->getStatusCode())
                     ->isEqualTo(400)
@@ -53,7 +58,7 @@ class ParamFetcherListener extends atoum\test
                         $base->onKernelController($event);
                     }
                 )
-                    ->isInstanceOf('Symfony\Component\HttpKernel\Exception\HttpException')
+                    ->isInstanceOf(HttpException::class)
                     ->hasMessage("Invalid parameters 'test2' for route 'get_test'")
                 ->integer($this->exception->getStatusCode())
                     ->isEqualTo(401)
@@ -72,7 +77,7 @@ class ParamFetcherListener extends atoum\test
                         $base->onKernelController($event);
                     }
                 )
-                    ->isInstanceOf('Symfony\Component\HttpKernel\Exception\HttpException')
+                    ->isInstanceOf(HttpException::class)
                     ->hasMessage("Invalid parameters 'test2' for route 'get_test'")
                 ->integer($this->exception->getStatusCode())
                     ->isEqualTo(400)
@@ -120,7 +125,7 @@ class ParamFetcherListener extends atoum\test
                 ->exception(function () use ($base, $event) {
                     $base->onKernelController($event);
                 })
-                    ->isInstanceOf('Symfony\Component\HttpKernel\Exception\HttpException')
+                    ->isInstanceOf(HttpException::class)
                 ->integer($this->exception->getStatusCode())
                     ->isEqualTo(400)
         ;
@@ -152,25 +157,24 @@ class ParamFetcherListener extends atoum\test
 
     protected function getControllerEvent($controllerMethod, $queryParams)
     {
-        $this->mockGenerator->orphanize('__construct');
-
         // Generate Request
-        $request = new \mock\Symfony\Component\HttpFoundation\Request();
-        $request->query = new ParameterBag($queryParams);
-        $request->request = new ParameterBag($queryParams);
-        $request->attributes = new ParameterBag(['_route' => 'get_test']);
+        $request = new Request($queryParams, $queryParams, ['_route' => 'get_test']);
 
         $this->mockGenerator->orphanize('__construct');
-
         // Generate Event
-        $event = new \mock\Symfony\Component\HttpKernel\Event\ControllerEvent();
-        $event->getMockController()->isMasterRequest = true;
-        $event->getMockController()->getRequest = $request;
-        $event->getMockController()->getController = [
-            'M6Web\Bundle\FOSRestExtraBundle\Tests\Units\EventListener\TestController',
-            $controllerMethod,
-        ];
+        $resolver = new \mock\Symfony\Component\HttpKernel\Controller\ControllerResolverInterface();
+        $httpKernel = new HttpKernel(
+            new EventDispatcher(),
+            $resolver,
+            null,
+            new \mock\Symfony\Component\HttpKernel\Controller\ArgumentResolverInterface()
+        );
 
-        return $event;
+        return new ControllerEvent(
+            $httpKernel,
+            [TestController::class, $controllerMethod],
+            $request,
+            HttpKernelInterface::MAIN_REQUEST
+        );
     }
 }

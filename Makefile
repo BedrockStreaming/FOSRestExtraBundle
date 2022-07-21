@@ -29,6 +29,7 @@ test: atoum
 .PHONY: clean-vendor
 clean-vendor:
 	$(call printSection,DEPENDENCIES clean)
+	rm -f ${SOURCE_DIR}/composer.lock
 	rm -rf ${SOURCE_DIR}/vendor
 
 .PHONY: composer-install
@@ -43,7 +44,7 @@ ${SOURCE_DIR}/vendor/composer/installed.json:
 .PHONY: atoum
 atoum:
 	$(call printSection,TEST atoum)
-	${BIN_DIR}/atoum
+	XDEBUG_MODE=coverage ${BIN_DIR}/atoum
 
 ### QUALITY ###
 

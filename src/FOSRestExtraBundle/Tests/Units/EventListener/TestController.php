@@ -9,25 +9,25 @@ class TestController
     /**
      * @RestrictExtraParam(true)
      */
-    public function getRestrictedTrueAction()
+    public static function getRestrictedTrueAction()
     {
     }
 
     /**
      * @RestrictExtraParam(false)
      */
-    public function getRestrictedFalseAction()
+    public static function getRestrictedFalseAction()
     {
     }
 
     /**
      * @RestrictExtraParam()
      */
-    public function getRestrictedDefaultAction()
+    public static function getRestrictedDefaultAction()
     {
     }
 
-    public function getNonRestrictedAction()
+    public static function getNonRestrictedAction()
     {
     }
 }

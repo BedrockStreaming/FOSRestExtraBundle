@@ -43,14 +43,7 @@ class M6WebFOSRestExtraExtension extends Extension
         }
     }
 
-    /**
-     * (non-PHPdoc)
-     *
-     * @see \Symfony\Component\DependencyInjection\Extension\Extension::getAlias()
-     *
-     * @return string
-     */
-    public function getAlias()
+    public function getAlias(): string
     {
         return 'm6_web_fos_rest_extra';
     }
